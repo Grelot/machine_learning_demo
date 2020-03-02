@@ -7,5 +7,4 @@ scipy
 collections-extended
 xgboost
 lightgbm
-warnings
 argparse
