@@ -1,0 +1,2 @@
+wget -q -O data/test.csv https://www.kaggle.com/c/house-prices-advanced-regression-techniques/download/EGpnHbJBO1XGF5B35WNU%2Fversions%2FHOSha0bPv4HEBGjo9O9x%2Ffiles%2Ftest.csv
+wget -q -O data/train.csv https://www.kaggle.com/c/house-prices-advanced-regression-techniques/download/EGpnHbJBO1XGF5B35WNU%2Fversions%2FHOSha0bPv4HEBGjo9O9x%2Ffiles%2Ftrain.csv
