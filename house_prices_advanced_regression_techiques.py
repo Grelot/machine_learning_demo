@@ -117,9 +117,17 @@ test = test.drop(labels = ["Id"],axis = 1)
 g = sns.jointplot(x = train['GrLivArea'], y = train['SalePrice'],kind="reg")
 g.annotate(stats.pearsonr)
 
-
 # explatory analysis sale price
 train['SalePrice'].describe()
 
 g = sns.distplot(train['SalePrice'],color="gray")
 g = g.legend(["Coefficient Assymetrie : {:.2f}".format(train['SalePrice'].skew())],loc='best')
+
+
+# correlation
+corrmat = train.corr()
+g = sns.heatmap(train.corr())
+
+# most correlated features
+top_corr_features = corrmat.index[abs(corrmat["SalePrice"])>0.5]
+g = sns.heatmap(train[top_corr_features].corr(),annot=True,cmap="RdYlGn")
