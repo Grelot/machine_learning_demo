@@ -8,7 +8,7 @@ _______________________________________________________________________________
 # Prerequisites
 
 * To run these analysis with python on local machine, see [INSTALL.sh](INSTALL.sh).
-* To run on binder server (no prerequisites), simply click on the button [![Binder](https://mybinder.org/badge_logo.svg)]() related to the analysis
+* To run on binder server (no prerequisites), simply click on the button ([![Binder](https://mybinder.org/badge_logo.svg)](https://github.com/Grelot/machine_learning_demo/#Contents)) related to the analysis
 
 # Contents
 
