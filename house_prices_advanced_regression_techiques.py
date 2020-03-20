@@ -82,6 +82,66 @@ def multiplot(data,features,plottype,nrows,ncols,figsize,y=None,colorize=False):
     plt.show()
     plt.gcf().clear()
 
+
+def RMSE(estimator,X_train, Y_train, cv=5,n_jobs=4):
+    """Regression linear models (Lasso, Ridge, Elasticnet)"""
+    cv_results = cross_val_score(estimator,X_train,Y_train,cv=cv,scoring="neg_mean_squared_error",n_jobs=n_jobs)
+    return (np.sqrt(-cv_results)).mean()
+
+
+def RMSE(estimator,X_train, Y_train, cv=5,n_jobs=4):
+    """Regression linear models Lasso, Ridge, Elasticnet"""
+    cv_results = cross_val_score(estimator,X_train,Y_train,cv=cv,scoring="neg_mean_squared_error",n_jobs=n_jobs)
+    return (np.sqrt(-cv_results)).mean()
+
+
+def plot_learning_curves(estimators, titles, X, y, ylim=None, cv=None,
+                        n_jobs=-1, train_sizes=np.linspace(.1, 1.0, 2)):
+    """Generate a simple plot of the test and training learning curve"""
+    nrows = len(estimators)//2
+    ncols = (len(estimators)//nrows)+ (0 if len(estimators) % nrows == 0 else 1)
+    plt.figure(1)
+    fig, axes = plt.subplots(nrows, ncols, figsize=(10, 10))
+    
+    n = 0
+    for col in range(ncols):
+        for row in range(nrows):
+            estimator = estimators[n]
+            title = titles[n]
+            axes[row, col].set_title(title)            
+            if ylim is not None:
+                axes[row, col].set_ylim(*ylim)            
+            axes[row, col].set_xlabel("Training examples")
+            axes[row, col].set_ylabel("Score")            
+            train_sizes, train_scores, test_scores = learning_curve(estimator,
+                    X, y, cv=cv, n_jobs=n_jobs, train_sizes=train_sizes,
+                    scoring="neg_mean_squared_error")    
+            train_scores = np.sqrt(-train_scores)
+            test_scores = np.sqrt(-test_scores)    
+            train_scores_mean = np.mean(train_scores, axis=1)
+            train_scores_std = np.std(train_scores, axis=1)
+            test_scores_mean = np.mean(test_scores, axis=1)
+            test_scores_std = np.std(test_scores, axis=1)
+            axes[row, col].grid()        
+            axes[row, col].fill_between(train_sizes, train_scores_mean - train_scores_std,
+                             train_scores_mean + train_scores_std, alpha=0.1,
+                     color="r")
+            axes[row, col].fill_between(train_sizes, test_scores_mean - test_scores_std,
+                     test_scores_mean + test_scores_std, alpha=0.1, color="g")
+            axes[row, col].plot(train_sizes, train_scores_mean, 'o-', color="r",
+                     label="Training score")
+            axes[row, col].plot(train_sizes, test_scores_mean, 'o-', color="g",
+                     label="Cross-validation score")
+            axes[row, col].legend(loc="best")
+            
+            n += 1
+    plt.tight_layout()
+    plt.show()
+    plt.gcf().clear()
+   
+
+
+
 #==============================================================================
 #MAIN
 #==============================================================================
@@ -252,3 +312,80 @@ dataset = N.transform(dataset)
 ## Separate train dataset and test dataset
 X_train = dataset[:train_len]
 test = dataset[train_len:]
+
+## Train classifiers
+Y_train = Y[:train_len]
+#### Lasso linear model with iterative fitting along a regularization path
+lassocv = LassoCV(eps=1e-7) 
+#### Tikhonov regularization
+ridge = Ridge(alpha=1e-6)
+#### Cross-validated Lasso, using the LARS algorithm
+lassolarscv = LassoLarsCV()
+#### Elastic Net model with iterative fitting along a regularization path.
+elasticnetcv = ElasticNetCV(eps=1e-15)
+
+
+## RMSE
+RMSE(lassocv, X_train, Y_train)
+RMSE(ridge, X_train, Y_train)
+RMSE(lassolarscv, X_train, Y_train)
+RMSE(elasticnetcv, X_train, Y_train)
+
+## fit model
+lassocv.fit(X_train,Y_train)
+ridge.fit(X_train,Y_train)
+lassolarscv.fit(X_train,Y_train)
+elasticnetcv.fit(X_train,Y_train)
+Y_pred_lassocv = np.expm1(lassocv.predict(test))
+Y_pred_lassolarscv = np.expm1(lassolarscv.predict(test))
+Y_pred_elasticnetcv = np.expm1(elasticnetcv.predict(test))
+
+## tree-like model
+
+## XGBoost
+model_xgb = xgb.XGBRegressor(colsample_bytree=0.2, gamma=0.0, 
+                             learning_rate=0.05, max_depth=6, 
+                             min_child_weight=1.5, n_estimators=7200,
+                             reg_alpha=0.9, reg_lambda=0.6,
+                             subsample=0.2,seed=42, silent=1)
+RMSE(model_xgb,X_train,Y_train)
+model_xgb.fit(X_train,Y_train)
+Y_pred_xgb = np.expm1(model_xgb.predict(test))
+## Gradient Boosting
+GBoost = GradientBoostingRegressor(n_estimators=3000, learning_rate=0.05,
+                                   max_depth=4, max_features='sqrt',
+                                   min_samples_leaf=15, min_samples_split=10, 
+                                   loss='huber', random_state =5)
+RMSE(GBoost,X_train,Y_train)
+GBoost.fit(X_train,Y_train)
+Y_pred_GBoost = np.expm1(GBoost.predict(test))
+
+## Light GBM
+LightGB = lgb.LGBMRegressor(objective='regression',num_leaves=5,
+                              learning_rate=0.05, n_estimators=720,
+                              max_bin = 55, bagging_fraction = 0.8,
+                              bagging_freq = 5, feature_fraction = 0.2319,
+                              feature_fraction_seed=9, bagging_seed=9,
+                              min_data_in_leaf =6, min_sum_hessian_in_leaf = 11)
+
+RMSE(LightGB,X_train,Y_train)
+LightGB.fit(X_train,Y_train)
+Y_pred_LightGB = np.expm1(LightGB.predict(test))
+
+## prediction generalization
+
+
+## learning curves
+estimators = [lassocv,lassolarscv,elasticnetcv,GBoost,LightGB,model_xgb]
+titles = ["LassoCV","LassoLarsCV","ElasticNet","Gradient Boosting","Light GBM","Xgboost"]
+plot_learning_curves(estimators, titles, X_train, Y_train, cv=2 ,n_jobs=4)
+
+
+## Submission KAGGLE
+results = pd.read_csv("data/house_prices_advanced_regression_techniques/sample_submission.csv")
+results["SalePrice"] = ((Y_pred_lassocv*0.4 + Y_pred_elasticnetcv*0.3 + Y_pred_lassolarscv*0.3))*0.4 + Y_pred_xgb*0.2 + Y_pred_GBoost*0.2 + Y_pred_LightGB*0.2
+results.to_csv("results/house_prices_advanced_regression_techniques/lm_house_saleprice_guerin.csv",index=False)
+
+
+## c'est fini :)
+###############################################################################
