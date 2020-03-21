@@ -10,3 +10,4 @@ lightgbm
 argparse
 keras
 tensorflow
+opencv-python
