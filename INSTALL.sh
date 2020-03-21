@@ -10,3 +10,6 @@ pip3 install xgboost
 pip3 install lightgbm
 
 pip3 install jupyter
+
+pip3 install keras
+pip3 install tensorflow
