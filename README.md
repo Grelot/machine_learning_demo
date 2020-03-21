@@ -7,8 +7,8 @@ _______________________________________________________________________________
 
 # Prerequisites
 
-* To run these analysis with python on local machine, see [INSTALL.sh](INSTALL.sh).
-* To run on binder server (no prerequisites), simply click on the button 'launch binder' related to the analysis
+* To run these analysis with python on a local machine using linux terminal, see [INSTALL.sh](INSTALL.sh).
+* To run on binder server using already built docker image with all prerequisites, simply click on the button 'launch binder' related to the analysis
 
 # Contents
 
