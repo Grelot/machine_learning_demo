@@ -1,4 +1,6 @@
 data/house-prices-advanced-regression-techniques/sample_submission.csv
 data/house-prices-advanced-regression-techniques/test.csv
 data/house-prices-advanced-regression-techniques/train.csv
+data/simpsons_characters_recognition_detection/*
+!data/simpsons_characters_recognition_detection/.gitkeep
 .ipynb_checkpoints/
