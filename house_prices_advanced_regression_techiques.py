@@ -89,12 +89,6 @@ def RMSE(estimator,X_train, Y_train, cv=5,n_jobs=4):
     return (np.sqrt(-cv_results)).mean()
 
 
-def RMSE(estimator,X_train, Y_train, cv=5,n_jobs=4):
-    """Regression linear models Lasso, Ridge, Elasticnet"""
-    cv_results = cross_val_score(estimator,X_train,Y_train,cv=cv,scoring="neg_mean_squared_error",n_jobs=n_jobs)
-    return (np.sqrt(-cv_results)).mean()
-
-
 def plot_learning_curves(estimators, titles, X, y, ylim=None, cv=None,
                         n_jobs=-1, train_sizes=np.linspace(.1, 1.0, 2)):
     """Generate a simple plot of the test and training learning curve"""
