@@ -12,6 +12,10 @@
 #
 # git repository : https://github.com/Grelot/machine_learning_demo
 #
+# kaggle profile : https://www.kaggle.com/pierreedouardguerin
+# 
+# kaggle compete : https://www.kaggle.com/c/house-prices-advanced-regression-techniques
+#
 #==============================================================================
 #NOTICE
 #==============================================================================
