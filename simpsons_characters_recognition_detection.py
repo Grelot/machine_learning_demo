@@ -47,8 +47,10 @@ from keras.preprocessing.image import ImageDataGenerator
 from keras.callbacks import ReduceLROnPlateau, ModelCheckpoint
 from keras.models import model_from_json
 
-import warnings
+from skimage.transform import resize
+from skimage import data
 
+import warnings
 warnings.filterwarnings('ignore')
 
 
@@ -66,11 +68,11 @@ def load_train_set(dirname,dict_characters):
     """load train data"""
     X_train = []
     Y_train = []
-    for label,character in dict_characters.items():
+    for label, character in dict_characters.items():
         list_images = os.listdir(dirname+'/'+character)
         for image_name in list_images:
-            image = matplotlib.pyplot.imread(dirname+'/'+character+'/'+image_name)
-            X_train.append(scipy.misc.imresize(image,(64,64),interp='lanczos'))
+            image =  plt.imread(dirname+'/'+character+'/'+image_name)            
+            X_train.append(resize(image,(64,64)))
             Y_train.append(label)
     return np.array(X_train), np.array(Y_train)
 
@@ -82,8 +84,8 @@ def load_test_set(dirname,dict_characters):
     for image_name in os.listdir(dirname):
         character_name = "_".join(image_name.split('_')[:-1])
         label = [label for label,character in dict_characters.items() if character == character_name][0]
-        image = scipy.misc.imread(dirname+'/'+image_name)
-        X_test.append(scipy.misc.imresize(image,(64,64),interp='lanczos'))
+        image = plt.imread(dirname+'/'+image_name)
+        X_test.append(resize(image,(64,64)))
         Y_test.append(label)
     return np.array(X_test), np.array(Y_test)
 
@@ -91,15 +93,20 @@ def load_test_set(dirname,dict_characters):
 #MAIN
 #==============================================================================
 
-https://www.kaggle.com/alexattia/the-simpsons-characters-dataset
+#https://www.kaggle.com/alexattia/the-simpsons-characters-dataset
 
 ## prepare data
+
+## name of characters
 dict_characters = {0: 'abraham_grampa_simpson', 1: 'apu_nahasapeemapetilon', 2: 'bart_simpson', 
         3: 'charles_montgomery_burns', 4: 'chief_wiggum', 5: 'comic_book_guy', 6: 'edna_krabappel', 
         7: 'homer_simpson', 8: 'kent_brockman', 9: 'krusty_the_clown', 10: 'lenny_leonard', 11:'lisa_simpson',
         12: 'marge_simpson', 13: 'mayor_quimby',14:'milhouse_van_houten', 15: 'moe_szyslak', 
         16: 'ned_flanders', 17: 'nelson_muntz', 18: 'principal_skinner', 19: 'sideshow_bob'}
-
-## load data
+## load train data
 X_train, Y_train = load_train_set("data/simpsons_characters_recognition_detection/the-simpsons-characters-dataset/simpsons_dataset/", dict_characters)       
+## load test data
 X_test, Y_test = load_test_set("data/simpsons_characters_recognition_detection/the-simpsons-characters-dataset/kaggle_simpson_testset/", dict_characters)
+## Scale data
+X_train = X_train / 255.0
+X_test = X_test / 255.0
